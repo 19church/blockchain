@@ -61,7 +61,7 @@ class Blockchain:
     #hashing
     def hash(self, block, nonce):
         #convert python object(dict) => json object
-        hhh = [block,nonce]
+        hhh = [block["data"],nonce]
         encode_block = json.dumps(hhh, sort_keys=True).encode()
 
         #sha - 256
@@ -77,9 +77,10 @@ class Blockchain:
             "nonce":nonce,
             "data":data,
             "previous_hash":previous_hash ,
+            "block_hash":""
         }
 
-        hhh = [block,nonce]
+        hhh = [block["data"],nonce]
 
         block_hash = hashlib.sha256(json.dumps(hhh, sort_keys=True).encode()).hexdigest()
 
@@ -100,7 +101,7 @@ class Blockchain:
         return self.chain[-1]
 
     #pow
-    def proof_of_work(self, previous_nonce):
+    def proof_of_work(self,block, previous_nonce):
         #require nonce => target hash => 0000fxxxxxxxx
         new_nonce = 1 #wanted nonce
         check_proof = False #target require
@@ -108,8 +109,11 @@ class Blockchain:
         #solve
         while check_proof is False:
             #hexadecimal
-            hash_operation = hashlib.sha256(str(new_nonce**2 - previous_nonce**2).encode()).hexdigest()
+            cal_nonce = new_nonce**2 - previous_nonce**2
+            hash_operation = self.hash(block, cal_nonce)
             if hash_operation[:4] == "0000":
+                block["nonce"] = new_nonce
+                block["block_hash"] = hash_operation
                 check_proof = True
             else:
                 new_nonce+=1
@@ -125,7 +129,8 @@ class Blockchain:
                 return False
             previous_nonce = previous_block["nonce"] # nonce of previous block
             nonce = block["nonce"] # nonce of verify block
-            hashoperation = hashlib.sha256(str(nonce**2 - previous_nonce**2).encode()).hexdigest()
+            cal_nonce = nonce**2 - previous_nonce**2
+            hashoperation = self.hash(block, cal_nonce)
             if hashoperation[:4] != "0000":
                 return False
             previous_block = block
@@ -289,13 +294,14 @@ def mining_block():
     previous_nonce = previous_block["nonce"]
 
     #nonce
-    nonce = blockchain.proof_of_work(previous_nonce)
+    nonce = 1
 
     #hash previous block
     previous_hash = previous_block["block_hash"]
 
     #update new block
     block = blockchain.create_block(nonce, previous_hash, data)
+    blockchain.proof_of_work(block, previous_nonce)
     
     response = {
         "message" : "Mining Block completed",
@@ -318,13 +324,14 @@ def add_new_block():
     previous_nonce = previous_block["nonce"]
 
     #nonce
-    nonce = blockchain.proof_of_work(previous_nonce)
+    nonce = 1
 
     #hash previous block
     previous_hash = previous_block["block_hash"]
 
     #update new block
     block = blockchain.create_block(nonce, previous_hash, data)
+    blockchain.proof_of_work(block, previous_nonce)
 
     print("Mining Block completed\n")
     print("=======================================\n")
@@ -349,13 +356,15 @@ def create_block_with_no_input(data):
     previous_nonce = previous_block["nonce"]
 
     #nonce
-    nonce = blockchain.proof_of_work(previous_nonce)
+    nonce = 1
 
     #hash previous block
     previous_hash = previous_block["block_hash"]
 
     #update new block
     block = blockchain.create_block(nonce, previous_hash, data)
+
+    blockchain.proof_of_work(block, previous_nonce)
     
     response = {
         "message" : "Mining Block completed",
@@ -401,16 +410,38 @@ create_block_with_no_input(testdata.data11)
 
 #ใช้งาน Blockchain
 if __name__ == "__main__" :
-    # while True :
-    #     print("=======================================\n")
-    #     print("============= Select Mode =============")
-    #     print("1 : add new block")
-    #     print("2 : show all block")
-    #     print("")
-    #     pass
-    get_all_block()
-    edit_block()
-    valid()
+    while True :
+        print("=======================================\n")
+        print("============= Select Mode =============")
+        print("1 : add new block")
+        print("2 : show all block")
+        print("3 : show block by Current_Roomer")
+        print("4 : edit block (for test is blockchain valid)")
+        print("5 : valid")
+        print("0 : exit")
+        print("\n=======================================\n")
+
+        try :
+            s_mode = int(input("Mode : "))
+        except :
+            print("input integer")
+            continue
+        if s_mode == 1 :
+            add_new_block()
+        elif s_mode == 2:
+            get_all_block()
+            pass
+        elif s_mode == 3:
+            get_block()
+            pass
+        elif s_mode == 4:
+            edit_block()
+        elif s_mode == 5:
+            valid()
+        elif s_mode == 0:
+            break
+        else :
+            print("invalid input")
 
     #input = int(input("Select Mode : "))
 
