@@ -97,3 +97,13 @@ data10 = {
     "District":"ชาไทย",
     "Province":"หมูทะ"
 }
+
+data11 = {
+    "Dormitory_Name":"ข้าวโพด",
+    "Room_Number":"011",
+    "Room_Size":"3.00  meter square",
+    "Monthly_Rent":"1 BTC",
+    "Current_Roomer":"ลักยิ้ม",
+    "District":"ชาไทย",
+    "Province":"หมูทะ"
+}
