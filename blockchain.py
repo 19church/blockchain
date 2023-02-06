@@ -61,7 +61,7 @@ class Blockchain:
     #hashing
     def hash(self, block, nonce):
         #convert python object(dict) => json object
-        hhh = [block["data"],nonce]
+        hhh = [block["data"],block["previous_hash"],nonce]
         encode_block = json.dumps(hhh, sort_keys=True).encode()
 
         #sha - 256
@@ -80,7 +80,7 @@ class Blockchain:
             "block_hash":""
         }
 
-        hhh = [block["data"],nonce]
+        hhh = [block["data"],block["previous_hash"],nonce]
 
         block_hash = hashlib.sha256(json.dumps(hhh, sort_keys=True).encode()).hexdigest()
 
@@ -236,7 +236,6 @@ def get_block() :
 #edit
 def edit_block():
     not_found = True
-    print(blockchain.chain[1]["index"])
     while True :
         try :
             s_block = int(input("Select Block Index : "))
